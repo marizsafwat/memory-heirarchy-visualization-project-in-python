@@ -49,4 +49,24 @@ def holes_map(start_add,size,total_size):
 
 
 
+def process_map(p,no_seg,name,size): #inputs       #function to take the input process attributes:noofsegment,size,name bs shayleen al attributes delwa2ty
+    #process_no=0  #name---> p []  no ---> num of seg []  name --> name of seg[] size --> size of seg[]
+    #p=[6,7] #num of procces
+    #no_seg=[2,1]
+    #name=['code','stack','data']
+    #size=[5,5,10]
+    print('p',p)
+    print ('no_seg',no_seg)
+    print('arr of names',name)
+    print('size',size)
+    process=[] #list for the input processes
+    count=0 #variable to make the loop iterate on all segments badal j
+      #(process_no,name,size)
+    for i in range(0,len(no_seg)):
+        for j in range(0,no_seg[i]): # i no of process and j no of segment
+            process.append((i,j,name[i][j],size[i][j],p[i]))
+            #process.append((i,j,name[count],size[count],p[i])) #f'P{i}' is a concatination method between leter p and integer i
+            #count +=1
+    return process
+
 
