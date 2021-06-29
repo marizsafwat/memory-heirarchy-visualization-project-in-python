@@ -69,4 +69,97 @@ def process_map(p,no_seg,name,size): #inputs       #function to take the input p
             #count +=1
     return process
 
+memory1=holes_map()
+memory2=[list(ele) for ele in memory1]
+print("new memory:")
+print(memory2)
+process2=process_map()
+process=[list(ele) for ele in process2]
+print("process array:")
+print(process)
 
+no_seg=[2,1]#segments each process [from GUI]
+p=[6,7]#from gui
+
+
+def ALLOCATION_FIRST_FIT(): #inputs      
+    ERROR =[]#rturned from fn 
+    COUNT_SEQ = 0
+    #p=[6,7,8]#from gui
+    #number_of_process = 1 # from GUI
+    for j in  range(0,len(no_seg)) :#process
+        for k in range (0,len(process)):#segments of all process
+          for i in range(0,len(memory2)-1): # memory
+             if process[k][0]==j : #segments of process j 
+                if memory2[i][3]=='h' and process[k][3] <= memory2[i][2]: #check for hole in memory #process[k][3]size sgment
+                    starting_add = memory2[i][1]
+                    memory2.insert(i,[process[k][2],starting_add,process[k][3],'P'+str(process[k][4])])
+                    memory2[i+1][1]+=process[k][3]#update starting address of hole
+                    memory2[i+1][2]-=process[k][3]#update size of hole
+                    COUNT_SEQ+=1 #process[k][2]name of sgment  
+                    break
+        print("count_seq=")
+        print(COUNT_SEQ)
+        if COUNT_SEQ == no_seg[j] :#check if all segments of this process is allocated
+            COUNT_SEQ = 0 
+             #fit allocation
+            continue
+        else :
+            ERROR.append(p[j])
+            COUNT_SEQ = 0 
+            print("gena hena")
+            DEALLOCATION(p[j],'P')# process doesn't fit
+    return (ERROR) 
+   
+def ALLOCATION_BEST_FIT(): #inputs       
+    ERROR =[] 
+    COUNT_SEQ = 0
+    FLAG_DONE = 0 
+    HOLES_ARRAY=[]
+    for v in range(0,len(memory2)):
+        if(memory2[v][3]=='h'):
+          HOLES_ARRAY.append(tuple(memory2[v]))
+    HOLES_ARRAY =sorted(HOLES_ARRAY, key=lambda k: [k[2], k[0], k[1],k[3]])
+    #for loop memory w a5od alli fehom nrtb holes de 7asb alsize
+    for j in  range(0,len(no_seg)) :#process
+        for k in range (0,len(process)):#segments of all process
+          for i in range(0,len(HOLES_ARRAY)): # memory
+             if process[k][0]==j : #segments of process j 
+                if   process[k][3] <= HOLES_ARRAY[i][2]: #check for hole in memory #process[k][3]size sgment
+                    #UPDATE_HOLES_ARRAY
+                    FLAG_DONE = 1
+                    SAVED_SIZE = HOLES_ARRAY[i][2]
+                    SAVED_add = HOLES_ARRAY[i][1]
+                    R = list(HOLES_ARRAY[i])
+                    R[2] = R[2]-process2[k][3] #update size
+                    R[1] = R[1]+process2[k][3] #update starting_address 
+                    z = tuple(R)
+                    HOLES_ARRAY.insert(i,z)
+                    HOLES_ARRAY.pop(i+1)
+                    
+                    #UPDATE_IN_MEMORY
+                    for E in range (0,len(memory2)):
+                        if (memory2[E][3]=='h') and (memory2[E][1]==SAVED_add) and (memory2[E][2]==SAVED_SIZE) :
+                            starting_add = memory2[E][1]
+                            memory2.insert(E,[process[k][2],starting_add,process[k][3],'P'+str(process[k][4])])
+                            memory2[E+1][1]+=process[k][3]#update starting address of hole
+                            memory2[E+1][2]-=process[k][3]#update size of hole
+                            COUNT_SEQ+=1 #process[k][2]name of sgment  
+                            break
+                    if FLAG_DONE == 1 : 
+                        FLAG_DONE = 0
+                        #resorting holes array for the next loop
+                        HOLES_ARRAY =sorted(HOLES_ARRAY, key=lambda k: [k[2], k[0], k[1],k[3]])
+                        break
+                    else : #complete searching for hole  
+                        continue   
+        if COUNT_SEQ == no_seg[j] :
+            COUNT_SEQ = 0 
+             #fit allocation
+            continue
+        else :
+            ERROR.append(p[j])
+            COUNT_SEQ = 0 
+            DEALLOCATION(p[j],'P')# process doesn't fit allocation
+            #DEALLOCATE SEGMENTS OF PROCESS J 
+    return (ERROR)
